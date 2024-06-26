@@ -1,0 +1,78 @@
+body{
+    width: 100%;
+    overflow: hidden;
+    background-color: #e6fff7;
+}
+
+.row1{
+    height: 600px;
+    
+    
+
+}
+
+.name{
+    font-size: 45px;
+    text-decoration: underline 5px black;
+}
+.first_letter{
+    color: red;
+}
+
+ul{
+    list-style-type: none;
+    
+}
+
+.icon-social{
+    position: fixed;
+    display: flex;
+    flex-direction:column ;
+    top: 50%;
+    right: 1%;
+    z-index: 100;
+}
+
+.icon-social a{
+    display: block;
+    width: 50px;
+    height: 50px;
+    color: white;
+    text-align: center;
+    font-size: 20px !important;
+    margin-bottom: 3px;
+}
+
+ul li{
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.active{
+    color: red;
+}
+
+.r1cl2{
+    padding-top: 50px;
+}
+.btn-danger{
+    width: 200px;
+    height: 60px;
+    border-radius: 50px;
+}
+li a:hover{
+    color: red;
+}
+li a{
+    color: black;
+}
+.col1{
+    
+    background-color: #ffb3b3;
+    padding-top: 70px !important;
+    padding-left: 70px !important;
+}
+
+.p,h2,h3{
+font-size: 30px;
+}
