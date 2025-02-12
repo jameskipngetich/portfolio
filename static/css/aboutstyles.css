@@ -12,6 +12,7 @@ body{
 .col1{
     
     background-color: #ffb3b3;
+    height: 100vh;
     padding-top: 70px !important;
     padding-left: 70px !important;
 }

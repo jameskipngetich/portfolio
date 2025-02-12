@@ -10,14 +10,14 @@ body{
  
    .col1{
     
-    height:600px;
+    height:100vh;
     background-color: #ffb3b3;
     padding-left: 70px !important;
     padding-top: 70px !important;
    }
    .col2{
     
-    height: 600px;
+    height: 100vh;
     
    }
    .row1cl2{
@@ -75,7 +75,7 @@ li a{
 }
 
 .design{
-    color: red;
+    color: rgb(18, 233, 90);
     margin-left: 50px;
 }
 

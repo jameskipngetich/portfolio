@@ -44,14 +44,14 @@ li a{
     
   }
   .col1{
-    height: 600px;
+    height: 100vh;
     background-color: #ffb3b3;
     
     padding-top: 70px !important;
     padding-left: 70px !important;
   }
   .col2{
-    height: 600px;
+    height: 100vh;
     
   }
   .cl2rw1{

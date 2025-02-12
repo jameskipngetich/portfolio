@@ -5,10 +5,10 @@ app=Flask(__name__)
 app.secret_key='someone is lazy'
 
 #CREATE A CONNECTION TO THE DATABASE, database configuration
-app.config['MYSQL_HOST']='localhost'
-app.config['MYSQL_USER']='root'
-app.config['MYSQL_PASSWORD']=''
-app.config['MYSQL_DB']='portfolio'
+app.config['MYSQL_HOST']='dpg-culftsd6l47c73do1560-a.singapore-postgres.render.com'
+app.config['MYSQL_USER']='james_kip:5tGvbXDyECUjm3y5hzMAx3jTaLhfTYVJ'
+app.config['MYSQL_PASSWORD']='5tGvbXDyECUjm3y5hzMAx3jTaLhfTYVJ'
+app.config['MYSQL_DB']='james_kip_portfolio_database'
 
 #calling the mysql function
 mysql=MySQL(app)
@@ -179,3 +179,6 @@ def delete():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+    
+   # https://github.com/jameskipngetich/portfolio
