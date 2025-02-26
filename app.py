@@ -1,21 +1,33 @@
 from flask import Flask,render_template,request,url_for,redirect,flash,session
-from flask_mysqldb import MySQL
+#from flask_mysqldb import MySQL
+import psycopg2
+from psycopg2 import sql
 import re
 app=Flask(__name__)
 app.secret_key='someone is lazy'
 
 #CREATE A CONNECTION TO THE DATABASE, database configuration
-app.config['MYSQL_HOST']='dpg-culftsd6l47c73do1560-a.singapore-postgres.render.com'
-app.config['MYSQL_USER']='james_kip:5tGvbXDyECUjm3y5hzMAx3jTaLhfTYVJ'
-app.config['MYSQL_PASSWORD']='5tGvbXDyECUjm3y5hzMAx3jTaLhfTYVJ'
-app.config['MYSQL_DB']='james_kip_portfolio_database'
+app.config['DB_HOST']='dpg-culftsd6l47c73do1560-a.singapore-postgres.render.com'
+app.config['DB_USER']='james_kip'
+app.config['DB_PASSWORD']='5tGvbXDyECUjm3y5hzMAx3jTaLhfTYVJ'
+app.config['DB_NAME']='james_kip_portfolio_database'
+
+def get_db_connecton():
+    conn = psycopg2.connect(
+        host=app.config['DB_HOST'],
+        database=app.config['DB_NAME'],
+        user=app.config['DB_USER'],
+        password=app.config['DB_PASSWORD']
+    )
+    return conn
+
 
 #calling the mysql function
-mysql=MySQL(app)
+#mysql=MySQL(app)
 
 #Validation phonenumber
 def is_valid_phone(phone):
-    pattern= r'^2547\d{8}$'
+    pattern= r'^\d{10}$'
     return re.match(pattern,phone)
 
 #Validate email address
@@ -28,10 +40,13 @@ def is_valid_email(email):
 def search():
     if request.method=='POST':
         value=request.form['value']
-        cur=mysql.connection.cursor()
-        cur.execute("SELECT * FROM contacts WHERE name LIKE %s OR phonenumber LIKE %s OR email LIKE %s OR message LIKE %s", (value,value,value,value))
+        conn= get_db_connecton()
+        cur=conn.cursor()
+        query = sql.SQL("SELECT * FROM contacts WHERE name LIKE %s OR phonenumber LIKE %s OR email LIKE %s OR message LIKE %s")
+        cur.execute(query , (value,value,value,value))
         data=cur.fetchall()
         cur.close()
+        conn.close()
         return render_template('search_results.html',contactsr=data)
 
 #END OF SEARCH
@@ -40,17 +55,20 @@ def search():
 @app.route('/insert' , methods=['POST'])
 def insert():
     if request.method=='POST':
-        flash("Data updated successfully")
+        
         name=request.form['name']
         phone=request.form['phonenumber']
         email=request.form['email']
         message=request.form['message']
 
         #check for duplicates
-        cur=mysql.connection.cursor()
-        cur.execute("SELECT * FROM contacts WHERE phonenumber=%s AND email=%s",(phone,email))
+        conn= get_db_connecton()
+        cur=conn.cursor()
+        query = sql.SQL("SELECT * FROM contacts WHERE phonenumber=%s AND email=%s")
+        cur.execute(query,(phone,email))
         contact=cur.fetchone()
         cur.close()
+        conn.close()
         
         if not(contact):
             if not(name and email and phone and message):
@@ -71,9 +89,12 @@ def insert():
         
             else:
                     #Open a connection to database
-                cur=mysql.connection.cursor()
-                cur.execute("INSERT INTO contacts(name,phonenumber,email,message) VALUES(%s,%s,%s,%s)",(name,phone,email,message))
-                mysql.connection.commit()
+                conn= get_db_connecton()
+                cur=conn.cursor()
+                query = sql.SQL("INSERT INTO contacts(name,phonenumber,email,message) VALUES(%s,%s,%s,%s)")
+                cur.execute(query,(name,phone,email,message))
+                conn.commit()
+                conn.close()
                 flash("Data saved successfully")
                 return redirect(url_for('contact_me'))
         else:
@@ -113,14 +134,18 @@ def login_admin():
     if request.method == 'POST':
         email=request.form['email']
         password=request.form['password']
-        cur=mysql.connection.cursor()
-        cur.execute("SELECT * FROM admins WHERE email = %s AND password = %s",(email,password))
+        conn= get_db_connecton()
+        cur=conn.cursor()
+        query=sql.SQL("SELECT * FROM admins WHERE email = %s AND password = %s")
+        cur.execute( query,(email,password))
         user=cur.fetchone()
         cur.close()
+        conn.close()
 
         if user :
             session['user_id']=user[0]
             session["user_name"]=user[1]
+            flash("Successfully logged in")
             return redirect(url_for('admin'))
         
         else :
@@ -133,15 +158,19 @@ def logmeout():
     if request.method == 'POST':
         session.pop('user_id', None)
         session.pop('user_name', None)
+        flash("Successfuly logged out")
         return redirect(url_for('login'))
 
 @app.route('/admin')
 def admin():
     if 'user_id' in session :
-        cur=mysql.connection.cursor()
-        cur.execute("SELECT * FROM contacts")
+        conn=get_db_connecton()
+        cur=conn.cursor()
+        query = sql.SQL("SELECT * FROM contacts")
+        cur.execute(query )
         data=cur.fetchall()
         cur.close()
+        conn.close()
         return render_template('admin.html', contactsr=data)
     else :
         flash("Failed !! Login Required")
@@ -150,15 +179,20 @@ def admin():
 @app.route('/update', methods=["POST"])
 def update():
     if request.method == "POST" :
-        flash("Data updated successfully")
+        
         id=request.form["id"]
         name=request.form["fullname"]
         phone=request.form["phonenumber"]
         email=request.form["email"]
         message=request.form["message"]
-        cur=mysql.connection.cursor()
-        cur.execute("""UPDATE contacts SET name=%s, phonenumber=%s, email=%s, message=%s WHERE id=%s""", (name,phone,email,message,id))
-        mysql.connection.commit()
+        conn= get_db_connecton()
+        cur=conn.cursor()
+        query = sql.SQL("""UPDATE contacts SET name=%s, phonenumber=%s, email=%s, message=%s WHERE id=%s""")
+        cur.execute(query, (name,phone,email,message,id))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash("Data updated successfully")
         return redirect(url_for("admin"))
     
 @app.route('/delete', methods=['POST'])
@@ -166,9 +200,14 @@ def delete():
     if request.method == 'POST':
         flash("Success!! One record deleted")
         id=request.form['id']
-        cur=mysql.connection.cursor()
-        cur.execute("""DELETE FROM contacts WHERE id=%s""",(id,))
-        mysql.connection.commit()
+        conn=get_db_connecton()
+        cur=conn.cursor()
+        query = sql.SQL("""DELETE FROM contacts WHERE id=%s""")
+        cur.execute(query,(id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash("Successfully deleted")
         return redirect(url_for('admin'))
 
 
