@@ -7,10 +7,10 @@ app=Flask(__name__)
 app.secret_key='someone is lazy'
 
 #CREATE A CONNECTION TO THE DATABASE, database configuration
-app.config['DB_HOST']='dpg-culftsd6l47c73do1560-a.singapore-postgres.render.com'
-app.config['DB_USER']='james_kip'
-app.config['DB_PASSWORD']='5tGvbXDyECUjm3y5hzMAx3jTaLhfTYVJ'
-app.config['DB_NAME']='james_kip_portfolio_database'
+app.config['DB_HOST']='dpg-cv9sa42n91rc738sh6a0-a.singapore-postgres.render.com'
+app.config['DB_USER']='jameskipportfoliodatabase1_user'
+app.config['DB_PASSWORD']='1dXNyb6tLDAc8rhcda6bgNuNukmEACwM'
+app.config['DB_NAME']='jameskipportfoliodatabase1'
 
 def get_db_connecton():
     conn = psycopg2.connect(
@@ -122,6 +122,8 @@ def services():
 @app.route('/contact_me')
 def contact_me():
     return render_template('contact.html')
+
+
 
 #LOGIN page
 @app.route('/login')
